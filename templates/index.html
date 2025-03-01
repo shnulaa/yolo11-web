@@ -7,59 +7,302 @@
     <link href="https://vjs.zencdn.net/7.4.1/video-js.css" rel="stylesheet">
     <script src='https://vjs.zencdn.net/7.4.1/video.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.15.0/videojs-contrib-hls.min.js" type="text/javascript"></script>
+    <!-- 添加 Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 添加 Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            margin: 0;
+            padding: 0;
         }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        #video_feed {
-            max-width: 100%;
-            border: 1px solid #ccc;
+        
+        .header {
+            background-color: #343a40;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .controls {
+        
+        .header h1 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 2.2rem;
+        }
+        
+        .header p {
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+        
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: #f1f3f5;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-control {
+            border-radius: 4px;
+            padding: 10px 15px;
+        }
+        
+        .btn {
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+            border-color: #b02a37;
+        }
+        
+        .btn-success {
+            background-color: #198754;
+            border-color: #198754;
+        }
+        
+        .btn-success:hover {
+            background-color: #157347;
+            border-color: #146c43;
+        }
+        
+        .video-container {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .video-js {
+            width: 100%;
+            height: 500px;
+            border-radius: 8px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .form-range {
+            height: 1.5rem;
+        }
+        
+        .param-value {
+            font-weight: 600;
+            color: #0d6efd;
+            width: 40px;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .alert {
+            display: none;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        
+        .model-select-container {
+            margin-top: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            background-color: #dc3545;
+        }
+        
+        .status-indicator.active {
+            background-color: #198754;
+        }
+        
+        .status-text {
+            font-weight: 500;
+        }
+        
+        .stream-status {
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .video-js {
+                height: 300px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>RTSP to HLS Stream with YOLOv11</h1>
-        <div class="controls">
-            <label for="rtsp_url">RTSP URL:</label>
-            <input type="text" id="rtsp_url" placeholder="Enter RTSP URL" value="http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226016/index.m3u8">
-            <button onclick="startStream()">Start Stream</button>
-            <button onclick="stopStream()">Stop Stream</button>
-            <br><br>
-            <label for="conf">Confidence:</label>
-            <input type="range" id="conf" min="0" max="1" step="0.01" value="0.5">
-            <span id="conf_value">0.5</span>
-            <br>
-            <label for="iou">IOU:</label>
-            <input type="range" id="iou" min="0" max="1" step="0.01" value="0.45">
-            <span id="iou_value">0.45</span>
-            <br>
-            <label for="line_width">Line Width:</label>
-            <input type="range" id="line_width" min="1" max="10" step="1" value="2">
-            <span id="line_width_value">2</span>
-            <br><br>
-            <button onclick="updateParams()">Update Parameters</button>
-            <div>
-                <label for="model_select">Model:</label>
-                <select id="model_select"></select>
-                <button onclick="changeModel()">Change Model</button>
+    <div class="main-container">
+        <div class="header text-center">
+            <h1><i class="fas fa-video me-2"></i> RTSP to HLS Stream with YOLOv11</h1>
+            <p>实时视频流目标检测系统</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <!-- 控制面板 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-cogs me-2"></i> 控制面板
+                    </div>
+                    <div class="card-body">
+                        <div class="stream-status">
+                            <span class="status-indicator" id="streamStatus"></span>
+                            <span class="status-text" id="statusText">未启动</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-link"></i></span>
+                            <input type="text" class="form-control" id="rtsp_url" placeholder="输入RTSP URL" value="http://ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221226016/index.m3u8">
+                        </div>
+                        
+                        <div class="d-grid gap-2 mb-4">
+                            <button class="btn btn-primary" onclick="startStream()">
+                                <i class="fas fa-play me-2"></i> 启动流
+                            </button>
+                            <button class="btn btn-danger" onclick="stopStream()">
+                                <i class="fas fa-stop me-2"></i> 停止流
+                            </button>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="conf" class="form-label">置信度 (Confidence)</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range" id="conf" min="0" max="1" step="0.01" value="0.5">
+                                <span class="param-value ms-2" id="conf_value">0.5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="iou" class="form-label">IOU 阈值</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range" id="iou" min="0" max="1" step="0.01" value="0.45">
+                                <span class="param-value ms-2" id="iou_value">0.45</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="line_width" class="form-label">线宽 (Line Width)</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range" id="line_width" min="1" max="10" step="1" value="2">
+                                <span class="param-value ms-2" id="line_width_value">2</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fps" class="form-label">帧率 (FPS) <small class="text-muted">(0 = 使用原始帧率)</small></label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range" id="fps" min="0" max="60" step="1" value="0">
+                                <span class="param-value ms-2" id="fps_value">0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button class="btn btn-success" onclick="updateParams()">
+                                <i class="fas fa-sync-alt me-2"></i> 更新参数
+                            </button>
+                        </div>
+                        
+                        <div class="model-select-container">
+                            <label for="model_select" class="form-label">检测模型</label>
+                            <div class="input-group">
+                                <select class="form-select" id="model_select"></select>
+                                <button class="btn btn-outline-secondary" onclick="changeModel()">
+                                    <i class="fas fa-exchange-alt"></i> 切换
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <!-- 视频显示区域 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-eye me-2"></i> 视频流
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="video-container">
+                            <video id="myVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup='{}'>
+                                <source id="source" src="/hls/stream.m3u8" type="application/x-mpegURL"></source>
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 提示信息 -->
+                <div class="alert alert-success" id="successAlert" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> <span id="successMessage"></span>
+                </div>
+                
+                <div class="alert alert-danger" id="errorAlert" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> <span id="errorMessage"></span>
+                </div>
             </div>
         </div>
-        <video id="myVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup='{}' style='width: 800px;height: 600px'>
-            <source id="source" src="/hls/stream.m3u8" type="application/x-mpegURL"></source>
-        </video>
     </div>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // 初始化视频播放器
+        var player = videojs('myVideo');
+        
+        // 全局变量
+        var isStreamRunning = false;
+        var streamCheckInterval = null;
+        
         // 更新参数值显示
         document.getElementById('conf').oninput = function() {
             document.getElementById('conf_value').innerText = this.value;
@@ -70,12 +313,55 @@
         document.getElementById('line_width').oninput = function() {
             document.getElementById('line_width_value').innerText = this.value;
         };
+        document.getElementById('fps').oninput = function() {
+            document.getElementById('fps_value').innerText = this.value;
+        };
 
-        // 发送参数更新请求
+        // 显示成功消息
+        function showSuccess(message) {
+            const alert = document.getElementById('successAlert');
+            document.getElementById('successMessage').innerText = message;
+            alert.style.display = 'block';
+            
+            // 5秒后自动隐藏
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // 显示错误消息
+        function showError(message) {
+            const alert = document.getElementById('errorAlert');
+            document.getElementById('errorMessage').innerText = message;
+            alert.style.display = 'block';
+            
+            // 5秒后自动隐藏
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // 更新流状态指示器
+        function updateStreamStatus(isRunning) {
+            isStreamRunning = isRunning;
+            const indicator = document.getElementById('streamStatus');
+            const statusText = document.getElementById('statusText');
+            
+            if (isRunning) {
+                indicator.classList.add('active');
+                statusText.innerText = '正在运行';
+            } else {
+                indicator.classList.remove('active');
+                statusText.innerText = '未启动';
+            }
+        }
+
+        // 修改更新参数函数，确保流正在运行时能正确重新加载
         function updateParams() {
             const conf = document.getElementById('conf').value;
             const iou = document.getElementById('iou').value;
             const line_width = document.getElementById('line_width').value;
+            const fps = document.getElementById('fps').value;
 
             fetch('/update_params', {
                 method: 'POST',
@@ -85,29 +371,52 @@
                 body: JSON.stringify({
                     conf: conf,
                     iou: iou,
-                    line_width: line_width
+                    line_width: line_width,
+                    fps: fps
                 }),
             }).then(response => response.json())
               .then(data => {
                   if (data.status === "success") {
-                      alert('Parameters updated successfully!');
+                      showSuccess('参数更新成功！');
                       
-                      const player = videojs('myVideo');
-                      player.src({
-                          src: '/hls/stream.m3u8',
-                          type: 'application/x-mpegURL'
-                      });
-                      player.load();
-                      player.play();
+                      if (isStreamRunning) {
+                          // 给服务器一些时间来应用新参数
+                          setTimeout(() => {
+                              // 检查流是否可用
+                              fetch('/hls/stream.m3u8', { method: 'HEAD' })
+                                  .then(response => {
+                                      if (response.ok) {
+                                          player.src({
+                                              src: '/hls/stream.m3u8?t=' + new Date().getTime(),
+                                              type: 'application/x-mpegURL'
+                                          });
+                                          player.load();
+                                          player.play()
+                                              .catch(e => console.log('自动播放失败，可能需要用户交互:', e));
+                                      }
+                                  });
+                          }, 2000);
+                      }
                   } else {
-                      alert('Failed to update parameters.');
+                      showError('参数更新失败。');
                   }
+              })
+              .catch(error => {
+                  showError('请求错误: ' + error);
               });
         }
 
         // 启动 RTSP 流
         function startStream() {
             const rtspUrl = document.getElementById('rtsp_url').value;
+            if (!rtspUrl) {
+                showError('请输入有效的RTSP URL');
+                return;
+            }
+            
+            // 显示加载状态
+            showSuccess('正在启动流，请稍候...');
+            
             fetch('/start_stream', {
                 method: 'POST',
                 headers: {
@@ -116,15 +425,78 @@
                 body: JSON.stringify({ rtsp_url: rtspUrl }),
             }).then(response => {
                 if (response.ok) {
-                    alert('Stream started successfully!');
+                    updateStreamStatus(true);
+                    
+                    // 清除之前的检查间隔
+                    if (streamCheckInterval) {
+                        clearInterval(streamCheckInterval);
+                    }
+                    
+                    // 定期检查流是否可用
+                    let attempts = 0;
+                    const maxAttempts = 30; // 最多尝试30次，每次1秒
+                    
+                    streamCheckInterval = setInterval(() => {
+                        attempts++;
+                        
+                        // 检查HLS流是否已经准备好
+                        fetch('/hls/stream.m3u8', { method: 'HEAD' })
+                            .then(response => {
+                                if (response.ok) {
+                                    // 流已准备好，可以播放
+                                    clearInterval(streamCheckInterval);
+                                    showSuccess('流启动成功！');
+                                    
+                                    // 重新加载播放器源
+                                    player.src({
+                                        src: '/hls/stream.m3u8?t=' + new Date().getTime(),
+                                        type: 'application/x-mpegURL'
+                                    });
+                                    player.load();
+                                    
+                                    // 监听播放器准备好事件
+                                    player.ready(function() {
+                                        // 确保播放器已加载
+                                        setTimeout(() => {
+                                            player.play()
+                                                .catch(e => {
+                                                    console.log('自动播放失败，可能需要用户交互:', e);
+                                                    showError('自动播放失败，请点击播放按钮');
+                                                });
+                                        }, 1000);
+                                    });
+                                } else if (attempts >= maxAttempts) {
+                                    // 超过最大尝试次数
+                                    clearInterval(streamCheckInterval);
+                                    showError('流启动超时，请检查RTSP URL或手动刷新页面');
+                                }
+                            })
+                            .catch(error => {
+                                if (attempts >= maxAttempts) {
+                                    clearInterval(streamCheckInterval);
+                                    showError('检查流状态失败: ' + error);
+                                }
+                            });
+                    }, 1000);
                 } else {
-                    alert('Failed to start stream.');
+                    showError('流启动失败。');
+                    updateStreamStatus(false);
                 }
+            })
+            .catch(error => {
+                showError('请求错误: ' + error);
+                updateStreamStatus(false);
             });
         }
 
         // 停止 RTSP 流
         function stopStream() {
+            // 清除流检查间隔
+            if (streamCheckInterval) {
+                clearInterval(streamCheckInterval);
+                streamCheckInterval = null;
+            }
+            
             fetch('/stop_stream', {
                 method: 'POST',
                 headers: {
@@ -132,16 +504,23 @@
                 },
             }).then(response => {
                 if (response.ok) {
-                    alert('Stream stopped successfully!');
+                    showSuccess('流停止成功！');
+                    updateStreamStatus(false);
+                    player.pause();
                 } else {
-                    alert('Failed to stop stream.');
+                    showError('流停止失败。');
                 }
+            })
+            .catch(error => {
+                showError('请求错误: ' + error);
             });
         }
 
         // Load available models when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadModels();
+            loadCurrentParams();
+            updateStreamStatus(false);
         });
         
         // Load available models
@@ -161,12 +540,21 @@
                         }
                         select.appendChild(option);
                     });
+                })
+                .catch(error => {
+                    showError('加载模型列表失败: ' + error);
                 });
         }
         
-        // Change detection model
+        // 修改切换模型函数，确保流正在运行时能正确重新加载
         function changeModel() {
-            const modelName = document.getElementById('model_select').value;
+            const modelSelect = document.getElementById('model_select');
+            if (!modelSelect.value) {
+                showError('请选择一个模型');
+                return;
+            }
+            
+            const modelName = modelSelect.value;
             
             fetch('/change_model', {
                 method: 'POST',
@@ -178,20 +566,56 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === "success") {
-                    alert(data.message);
+                    showSuccess(data.message);
                     
-                    // Reload the video
-                    const player = videojs('myVideo');
-                    player.src({
-                        src: '/hls/stream.m3u8',
-                        type: 'application/x-mpegURL'
-                    });
-                    player.load();
-                    player.play();
+                    if (isStreamRunning) {
+                        // 给服务器一些时间来切换模型
+                        setTimeout(() => {
+                            // 检查流是否可用
+                            fetch('/hls/stream.m3u8', { method: 'HEAD' })
+                                .then(response => {
+                                    if (response.ok) {
+                                        player.src({
+                                            src: '/hls/stream.m3u8?t=' + new Date().getTime(),
+                                            type: 'application/x-mpegURL'
+                                        });
+                                        player.load();
+                                        player.play()
+                                            .catch(e => console.log('自动播放失败，可能需要用户交互:', e));
+                                    }
+                                });
+                        }, 3000);
+                    }
                 } else {
-                    alert('Error: ' + data.message);
+                    showError('错误: ' + data.message);
                 }
+            })
+            .catch(error => {
+                showError('请求错误: ' + error);
             });
+        }
+
+        // 加载当前参数设置
+        function loadCurrentParams() {
+            fetch('/get_params')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新滑块值
+                    document.getElementById('conf').value = data.conf;
+                    document.getElementById('conf_value').innerText = data.conf;
+                    
+                    document.getElementById('iou').value = data.iou;
+                    document.getElementById('iou_value').innerText = data.iou;
+                    
+                    document.getElementById('line_width').value = data.line_width;
+                    document.getElementById('line_width_value').innerText = data.line_width;
+                    
+                    document.getElementById('fps').value = data.fps;
+                    document.getElementById('fps_value').innerText = data.fps;
+                })
+                .catch(error => {
+                    console.error('加载参数失败:', error);
+                });
         }
     </script>
 </body>
