@@ -1,6 +1,6 @@
 # RTSP to HLS Stream with YOLOv11
 
-这个项目是一个基于Flask的Web应用，可以接收RTSP视频流，使用YOLOv11进行实时目标检测，并将处理后的视频转换为HLS格式进行流式传输。
+这是一个基于Flask的Web应用项目，可以接收RTSP视频流，使用YOLOv11进行实时目标检测，并将处理后的视频转换为HLS格式进行流式传输。
 
 ## 功能特点
 
@@ -29,14 +29,14 @@ cd yolo11-web
 ### 2. 创建虚拟环境（可选但推荐）
 
 ```bash
-conda　create -n yolo11-web python=3.10
+conda create -n yolo11-web python=3.10
 conda activate yolo11-web
 ```
 
 ### 3. 安装依赖
 
 ```bash
-pip install -r requirements.txt
+pip install -r [requirements.txt](requirements.txt)
 ```
 
 ### 4. 安装FFmpeg
@@ -92,12 +92,12 @@ python app.py
 
 ```
 yolo11-web/
-├── app.py                # 主应用程序
+├── [app.py](app.py)                # 主应用程序
 ├── templates/            # HTML模板
-│   └── index.html        # Web界面
+│   └── [index.html](templates/index.html)        # Web界面
 ├── hls/                  # HLS流文件目录（自动创建）
 ├── weights/              # YOLOv11模型目录
-├── Dockerfile            # Docker构建文件
+├── [Dockerfile](Dockerfile)            # Docker构建文件
 ├── requirements.txt      # 项目依赖
 └── README.md             # 项目说明
 ```
