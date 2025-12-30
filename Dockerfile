@@ -17,7 +17,7 @@ RUN pip3 install --no-cache-dir torch torchvision --index-url https://download.p
 FROM python:3.10-slim AS base-cpu
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg libsm6 libxext6 libgl1-mesa-glx libglib2.0-0 \
+    ffmpeg libsm6 libxext6 libgl1 libglib2.0-0 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /tmp/
