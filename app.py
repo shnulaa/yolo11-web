@@ -31,8 +31,9 @@ def check_nvenc_support():
         result = subprocess.run(["ffmpeg", "-encoders"], capture_output=True, text=True)
         if "h264_nvenc" not in result.stdout:
             return False
+        # 用更大的分辨率测试（NVENC 最小支持 145x49）
         test = subprocess.run(
-            ["ffmpeg", "-f", "lavfi", "-i", "nullsrc=s=64x64:d=1", "-c:v", "h264_nvenc", "-f", "null", "-"],
+            ["ffmpeg", "-f", "lavfi", "-i", "nullsrc=s=256x256:d=1", "-c:v", "h264_nvenc", "-f", "null", "-"],
             capture_output=True, text=True
         )
         return test.returncode == 0
