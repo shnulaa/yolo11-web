@@ -4,13 +4,18 @@ ARG DEVICE=cuda
 # ============ CUDA 基础镜像 ============
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 AS base-cuda
 
-# 添加 NVIDIA 编码库支持
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip \
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
     ffmpeg \
-    libgl1 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgl1-mesa-glx \
     libglib2.0-0 \
-    libnvidia-encode-525 \
+    wget \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /tmp/
