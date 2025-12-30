@@ -2,14 +2,20 @@
 ARG DEVICE=cuda
 
 # ============ CUDA 基础镜像 ============
-FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime AS base-cuda
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 AS base-cuda
 
+# 添加 NVIDIA 编码库支持
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg libgl1 libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/* /root/.cache
+    python3 python3-pip \
+    ffmpeg \
+    libgl1 \
+    libglib2.0-0 \
+    libnvidia-encode-525 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /tmp/
-RUN pip install --no-cache-dir -r /tmp/requirements.txt \
+RUN pip3 install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cu118 \
+    && pip3 install --no-cache-dir -r /tmp/requirements.txt \
     && rm -rf /root/.cache /tmp/*
 
 # ============ CPU 基础镜像 ============
